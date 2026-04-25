@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Lets try Linting tests
+title: "Lets try Linting tests"
 date: 2026-04-25
 ---
 
