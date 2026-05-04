@@ -91,6 +91,8 @@ jobs:
         run: |
           docker run \
             --rm \
+            -e JEKYLL_NO_CACHE=true \
+            -e JEKYLL_CACHE_DIR=/tmp/jekyll-cache \
             -v ${{ github.workspace }}:/srv/jekyll \
             -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
             jekyll/jekyll:latest \
