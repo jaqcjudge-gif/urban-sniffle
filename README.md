@@ -45,7 +45,7 @@ The reflection prompts at each stage are not optional extras — they are direct
 | Basic command-line familiarity | `cd`, `ls`, `git add/commit/push` |
 | A text editor | VS Code recommended |
 
-No prior DevOps experience is assumed. 
+No prior DevOps experience is assumed.
 
 ---
 
@@ -53,7 +53,7 @@ No prior DevOps experience is assumed.
 
 After completing all stages, your repository will look something like this:
 
-```
+<!-- 
 .
 ├── .github/
 │   └── workflows/
@@ -76,7 +76,7 @@ After completing all stages, your repository will look something like this:
 ├── index.md
 ├── Gemfile
 └── README.md
-```
+-->
 
 The `_posts/`, `_config.yml`, `index.md`, and `Gemfile` files make up the minimal Jekyll site. Everything else is added as you work through the stages.
 
@@ -92,33 +92,33 @@ The `_posts/`, `_config.yml`, `index.md`, and `Gemfile` files make up the minima
 
 The journey begins with the simplest possible deployment: publishing a Jekyll blog on GitHub Pages. This gives you a tangible, publicly visible outcome immediately and introduces the fundamental CI/CD loop:
 
-```
+<!-- 
 code → commit → push → build → deploy
-```
+-->
 
 ### Step-by-step
 
 **1. Confirm your Jekyll site files are in place.** Your repository should already contain:
 
-```
+<!-- 
 _config.yml
 _posts/
     2024-01-01-hello-world.md
 index.md
 Gemfile
-```
+-->
 
 If any of these are missing, create them now. A minimal `_config.yml` looks like:
 
-```yaml
+<!-- yaml
 title: My DevOps Blog
 description: Built as part of a Level 5 DevOps learning guide.
 theme: minima
-```
+-->
 
 A minimal post (`_posts/2024-01-01-hello-world.md`):
 
-```markdown
+<!-- markdown
 ---
 layout: post
 title: "Hello, World"
@@ -126,7 +126,8 @@ date: 2024-01-01
 ---
 
 This is my first post. The pipeline that published it is the point.
-```
+-->
+
 
 **2. Add the workflow.** In GitHub, go to **Actions → New workflow** and search for **"GitHub Pages Jekyll"** (under the *Pages* category). The description reads: *"Package a Jekyll site with GitHub Pages dependencies preinstalled."*
 
@@ -138,22 +139,22 @@ Click **Configure**, review the YAML, and commit it to `main`.
 
 ### What to look for in the workflow YAML
 
-```yaml
+<!--yaml
 on:
   push:
     branches: ["main"]
-```
+-->
 
 This `on:` block is the **trigger**. It tells GitHub Actions to run this workflow whenever code is pushed to `main`. You will see this pattern in every workflow you add.
 
-```yaml
+<!--yaml
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/jekyll-build-pages@v1
-```
+-->
 
 Each **job** runs on a **runner** (a temporary virtual machine). Each job contains **steps** — individual actions or shell commands run in sequence.
 
@@ -225,11 +226,11 @@ Super Linter is ideal for a Jekyll repository because it checks HTML, Markdown, 
 
 Set the trigger to run on `pull_request` events:
 
-```yaml
+<!--yaml
 on:
   pull_request:
     branches: ["main"]
-```
+-->
 
 **2. Add the Dependency Review workflow.** Search for **"Dependency Review"** (under *Security*). The description reads: *"Scans Pull Requests on each push for the introduction and/or resolution of vulnerable dependencies."*
 
@@ -277,14 +278,14 @@ Security is introduced here as a **first-class part of the pipeline**, not an af
 
 In traditional software development, security testing happened late — often after deployment. "Shifting left" means moving security checks earlier in the pipeline, closer to where code is written. The earlier a vulnerability is found, the cheaper it is to fix.
 
-```
+<!--
 [Write code] → [Commit] → [PR] → [Merge] → [Build] → [Deploy] → [Production]
      ↑                      ↑                  ↑                       ↑
   Cheapest                  │               Expensive             Very expensive
   to fix                    │               to fix                to fix
                      Shift left means
                      catching issues HERE
-```
+-->
 
 ### Step-by-step
 
@@ -330,7 +331,7 @@ Your blog is now well-tested and secure. This stage steps back from the applicat
 
 A minimal `terraform/main.tf` might look like:
 
-```hcl
+<!--hcl
 terraform {
   required_providers {
     aws = {
@@ -348,14 +349,14 @@ resource "aws_s3_bucket" "blog_assets" {
     ManagedBy   = "terraform"
   }
 }
-```
+-->
 
 **3. Configure the workflow for plan/apply separation.** This is the most important practice in this stage. Edit the Terraform workflow YAML so that:
 
 - On **pull request** → run `terraform plan` only (show what *would* change — do not make any changes)
 - On **push to main** → run `terraform apply` (make the changes)
 
-```yaml
+<!--yaml
 - name: Terraform Plan
   if: github.event_name == 'pull_request'
   run: terraform plan -no-color
@@ -363,7 +364,7 @@ resource "aws_s3_bucket" "blog_assets" {
 - name: Terraform Apply
   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
   run: terraform apply -auto-approve
-```
+-->
 
 This separation means a human reviews the plan output in the PR before any infrastructure is changed. It is the IaC equivalent of a code review.
 
@@ -397,21 +398,21 @@ With infrastructure defined as code and a secure CI pipeline in place, this stag
 
 This workflow builds your Jekyll Docker image (from Stage 2) and publishes it to **GitHub Container Registry (GHCR)** as a versioned, reusable artefact. Configure it to trigger on **release** events or on tagged commits (e.g. `v1.0.0`):
 
-```yaml
+<!--yaml
 on:
   push:
     tags:
       - 'v*.*.*'
-```
+-->
 
 After the workflow runs, go to your repository's **Packages** tab — you will see your Docker image listed there, tagged with the version number.
 
 **2. Create a release tag** and watch the workflow publish the image:
 
-```bash
+<!--bash
 git tag v1.0.0
 git push origin v1.0.0
-```
+-->
 
 **3. Add the SLSA Generic Generator.** Search for **"SLSA Generic Generator"** (under *CI*). The description reads: *"Generate SLSA3 provenance for your existing release workflows."*
 
@@ -447,7 +448,7 @@ The final stage shifts focus from automating the *build* to automating the *proc
 
 Create a `.github/labeler.yml` configuration file to define your label rules:
 
-```yaml
+<!--yaml
 content:
   - _posts/**
   - index.md
@@ -461,20 +462,20 @@ ci:
 dependencies:
   - Gemfile
   - Gemfile.lock
-```
+-->
 
 Now when a contributor opens a PR touching `_posts/`, it is automatically labelled `content`. A PR touching `terraform/` is labelled `infrastructure`. This makes triage effortless — especially in a team with many open PRs.
 
 **2. Add the Stale workflow.** Search for **"Stale"** (under *Automation*). This workflow automatically marks issues and pull requests as stale if they have had no activity for a configurable number of days, and optionally closes them after a further period.
 
-```yaml
+<!--yaml
 - uses: actions/stale@v9
   with:
     stale-issue-message: 'This issue has had no activity for 30 days and has been marked as stale.'
     stale-pr-message: 'This PR has had no activity for 14 days and has been marked as stale.'
     days-before-stale: 30
     days-before-close: 7
-```
+-->
 
 A healthy backlog is not just about adding things — it is about removing things that are no longer relevant.
 
