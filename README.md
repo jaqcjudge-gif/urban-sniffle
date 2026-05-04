@@ -327,7 +327,7 @@ Your blog is now well-tested and secure. This stage steps back from the applicat
 
 **1. Add the Terraform workflow.** Go to **Actions → New workflow** and search for **"Terraform"** by HashiCorp (under *Deployment*). The description reads: *"Set up Terraform CLI in your GitHub Actions workflow."*
 
-**2. Write a minimal Terraform configuration.** Create a `terraform/` directory in your repository with a simple configuration. A good starting example is provisioning a cloud storage bucket (e.g. an AWS S3 bucket or a Google Cloud Storage bucket) — something that has no running cost but demonstrates the full Terraform workflow. Your facilitator will provide the specific cloud 
+**2. Write a minimal Terraform configuration.** Create a `terraform/` directory in your repository with a simple configuration. A good starting example is provisioning a cloud storage bucket (e.g. an AWS S3 bucket or a Google Cloud Storage bucket) — something that has no running cost but demonstrates the full Terraform workflow. Your facilitator will provide the specific cloud
 provider and credentials to use.
 
 A minimal `terraform/main.tf` might look like:
