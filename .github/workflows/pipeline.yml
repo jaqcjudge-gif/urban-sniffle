@@ -8,9 +8,7 @@ on:
 
 jobs:
 
-  # ---------------------------------------------------------
   # 1. LINTING (Super Linter)
-  # ---------------------------------------------------------
   lint:
     name: Lint Code Base
     runs-on: ubuntu-latest
@@ -27,9 +25,7 @@ jobs:
           VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
 
-  # ---------------------------------------------------------
   # 2. CODEQL SECURITY SCAN
-  # ---------------------------------------------------------
   codeql:
     name: CodeQL Analysis
     needs: lint
@@ -59,9 +55,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
 
-  # ---------------------------------------------------------
   # 3. TRIVY VULNERABILITY SCAN
-  # ---------------------------------------------------------
   trivy:
     name: Trivy Security Scan
     needs: codeql
@@ -76,11 +70,9 @@ jobs:
           scan-type: fs
           severity: HIGH,CRITICAL
 
-  # ---------------------------------------------------------
-  # 4. JEKYLL CL
-  # ---------------------------------------------------------
+  # 4. JEKYLL BUILD (DOCKER, NO GEMFILE)
   jekyll_build:
-    name: Build Jekyll Site (Ruby)
+    name: Build Jekyll Site (Docker)
     needs: trivy
     runs-on: ubuntu-latest
 
@@ -88,17 +80,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-          bundler-cache: true
-
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Build Jekyll site
-        run: bundle exec jekyll build
+      - name: Build the site in the jekyll/builder container
+        run: |
+          docker run \
+            -v ${{ github.workspace }}:/srv/jekyll \
+            -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+            jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
 
       - name: Upload built site as artifact
         uses: actions/upload-artifact@v4
@@ -106,9 +93,7 @@ jobs:
           name: site
           path: _site
 
-  # ---------------------------------------------------------
-  # 5. DEPLOY TO MAIN BRANCH Jekyll
-  # ---------------------------------------------------------
+  # 5. DEPLOY TO MAIN BRANCH
   deploy:
     name: Deploy to GitHub Pages (main → main)
     needs: jekyll_build
