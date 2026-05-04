@@ -104,12 +104,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+  
       - name: Download built site
         uses: actions/download-artifact@v4
         with:
           name: site
           path: _site
+
+      - name: Clean old site
+        run: |
+          find . -maxdepth 1 ! -name '_site' ! -name '.git' ! -name '.' -exec rm -rf {} +
 
       - name: Deploy to main branch
         run: |
