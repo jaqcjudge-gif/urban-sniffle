@@ -172,11 +172,11 @@ Each **job** runs on a **runner** (a temporary virtual machine). Each job contai
 
 ---
 
-### What you are doing
+### What you are doing1
 
 The Stage 1 workflow uses GitHub-hosted dependencies that could change at any time. This stage introduces a containerised build, where the build environment itself is defined in code.
 
-### Step-by-step
+### Step-by-step1
 
 **1. Add the workflow.** Go to **Actions → New workflow** and search for **"Jekyll using Docker image"** (under *Continuous Integration / Suggested*). The description reads: *"Package a Jekyll site using the jekyll/builder Docker image."*
 
@@ -200,7 +200,7 @@ In DevOps, an environment that exists only in one developer's head (or on one sp
 
 This connects directly to the DevOps principle of **immutable infrastructure**: the environment is treated like code — defined once, deployed consistently, never modified in place.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts1
 
 - What is the risk of relying on `ubuntu-latest` as your runner without pinning dependency versions?
 - If a colleague clones this repository and runs the Docker workflow, will they get the same result as you? Why?
@@ -214,11 +214,11 @@ This connects directly to the DevOps principle of **immutable infrastructure**: 
 
 ---
 
-### What you are doing
+### What you are doing2
 
 Before deploying anything, we should verify it is correct. This stage introduces **quality gates** — automated checks that must pass before code can be merged into `main`.
 
-### Step-by-step
+### Step-by-step2
 
 **1. Add the Super Linter workflow.** Go to **Actions → New workflow** and search for **"Super Linter"** (under *CI*). The description reads: *"Run linters for several languages on your code base for changed files."*
 
@@ -256,7 +256,7 @@ From now on, code can only reach `main` if it passes your quality gates.
 
 Stage 1 gave you CD. Stage 3 gives you CI. Together, they form a proper CI/CD pipeline.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts2
 
 - What is the difference between a **linter** and a **test**? Are both valuable? Why?
 - What would happen to your team's workflow without branch protection rules?
@@ -270,7 +270,7 @@ Stage 1 gave you CD. Stage 3 gives you CI. Together, they form a proper CI/CD pi
 
 ---
 
-### What you are doing
+### What you are doing3
 
 Security is introduced here as a **first-class part of the pipeline**, not an afterthought bolted on at the end. You will add three security-focused workflows that run automatically.
 
@@ -287,7 +287,7 @@ In traditional software development, security testing happened late — often af
                      catching issues HERE
 -->
 
-### Step-by-step
+### Step-by-step3
 
 **1. Add CodeQL Analysis.** Go to **Actions → New workflow** and search for **"CodeQL Analysis"** (under *Security*). This is GitHub's own semantic code analysis engine. Even for a Jekyll site with Ruby and JavaScript files, CodeQL can identify logic flaws, injection vulnerabilities, and unsafe patterns.
 
@@ -305,7 +305,7 @@ Scorecard does not just scan code — it assesses your *practices*: Are your dep
 
 CodeQL and Trivy both produce results in **SARIF format** (Static Analysis Results Interchange Format). GitHub reads these files and displays findings directly in the **Security → Code scanning alerts** tab, with line-level annotations in pull requests. You do not need to parse the SARIF files yourself — just know that this is what connects the workflow output to the Security tab.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts3
 
 - What is the difference between **SAST** (Static Application Security Testing) and scanning a Docker image with Trivy?
 - Your OSSF Scorecard result is likely imperfect. Pick one failing check: what would you need to change to improve it, and why does it matter?
@@ -319,15 +319,16 @@ CodeQL and Trivy both produce results in **SARIF format** (Static Analysis Resul
 
 ---
 
-### What you are doing
+### What you are doing4
 
 Your blog is now well-tested and secure. This stage steps back from the application and considers the infrastructure it runs on. Even if GitHub Pages handles your hosting, real-world systems run on cloud infrastructure — and that infrastructure should be defined in code, not clicked together in a web console.
 
-### Step-by-step
+### Step-by-step4
 
 **1. Add the Terraform workflow.** Go to **Actions → New workflow** and search for **"Terraform"** by HashiCorp (under *Deployment*). The description reads: *"Set up Terraform CLI in your GitHub Actions workflow."*
 
-**2. Write a minimal Terraform configuration.** Create a `terraform/` directory in your repository with a simple configuration. A good starting example is provisioning a cloud storage bucket (e.g. an AWS S3 bucket or a Google Cloud Storage bucket) — something that has no running cost but demonstrates the full Terraform workflow. Your facilitator will provide the specific cloud provider and credentials to use.
+**2. Write a minimal Terraform configuration.** Create a `terraform/` directory in your repository with a simple configuration. A good starting example is provisioning a cloud storage bucket (e.g. an AWS S3 bucket or a Google Cloud Storage bucket) — something that has no running cost but demonstrates the full Terraform workflow. Your facilitator will provide the specific cloud 
+provider and credentials to use.
 
 A minimal `terraform/main.tf` might look like:
 
@@ -374,7 +375,7 @@ This separation means a human reviews the plan output in the PR before any infra
 
 Terraform is **idempotent**: running `terraform apply` twice against unchanged configuration produces no second change. The tool calculates the difference between your *desired state* (the code) and the *actual state* (the cloud) and only makes the changes needed to close the gap. This makes infrastructure management predictable and safe to automate.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts4
 
 - What is the risk of managing cloud infrastructure through a web console rather than code? Think about audit trails, team collaboration, and reproducibility.
 - Why is plan/apply separation important? What could go wrong if `apply` ran automatically on every commit?
@@ -388,11 +389,11 @@ Terraform is **idempotent**: running `terraform apply` twice against unchanged c
 
 ---
 
-### What you are doing
+### What you are doing5
 
 With infrastructure defined as code and a secure CI pipeline in place, this stage focuses on how software is **packaged and released** in a way that is verifiable, versioned, and trustworthy.
 
-### Step-by-step
+### Step-by-step5
 
 **1. Add the Publish Docker Container workflow.** Go to **Actions → New workflow** and search for **"Publish Docker Container"** (under *CI*). The description reads: *"Build, test and push Docker image to GitHub Packages."*
 
@@ -424,7 +425,7 @@ Imagine downloading a Docker image and having no way to verify whether it was bu
 
 The [SLSA framework](https://slsa.dev) defines four levels (0–3). Level 3, which this workflow targets, requires a hardened, isolated build environment with verifiable provenance — exactly what GitHub Actions provides when configured correctly.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts5
 
 - What is the difference between a **Docker image** stored in a registry and the **source code** stored in your repository? Why do both need version control?
 - If someone downloaded your published Docker image, how could SLSA provenance help them trust it?
@@ -438,11 +439,11 @@ The [SLSA framework](https://slsa.dev) defines four levels (0–3). Level 3, whi
 
 ---
 
-### What you are doing
+### What you are doing6
 
 The final stage shifts focus from automating the *build* to automating the *process* around the build. These workflows reduce **toil** — the manual, repetitive work that keeps a project running but adds no lasting value — and help enforce healthy team norms at scale.
 
-### Step-by-step
+### Step-by-step6
 
 **1. Add the Labeler workflow.** Go to **Actions → New workflow** and search for **"Labeler"** (under *Automation*). This workflow automatically applies labels to pull requests based on which files were changed.
 
@@ -496,7 +497,7 @@ The [DORA metrics](https://dora.dev) are the industry-standard measures of DevOp
 
 The automation in this stage directly reduces **lead time** by removing manual triage steps. Stale issue management improves team **flow** — one of the human factors that DORA research consistently identifies as a predictor of high performance.
 
-### 💬 Reflection prompts
+### 💬 Reflection prompts6
 
 - What is **toil** in a DevOps context? Give one example from your own workflow that could be automated with a GitHub Actions trigger.
 - Which DORA metric do you think your pipeline has improved the most? Which is hardest to measure from your pipeline alone?
